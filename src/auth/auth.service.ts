@@ -23,6 +23,7 @@ export class AuthService {
 
     
     async register(registerDto: RegisterDto): Promise<User>{
+        console.log("test");
         const queryRunner = this.connection.createQueryRunner();
         await queryRunner.connect();
         try{
