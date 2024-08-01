@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres
+    container_name: e-commerce-nest-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: e-commerce-nest
+    ports:
+      - "5000:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+  app:
+    build: .
+    container_name: nest-app
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=e-commerce-nest-db
+      - DB_PORT=5432
+      - DB_DATABASE=e-commerce-nest
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=123456
+      - JWT_SECRET=1a438f5c5ac4d8a2749d4beb13e98fd697dfc10df3159afb5abbf0693c4033aa
+    depends_on:
+      - db
+
+volumes:
+  db-data:

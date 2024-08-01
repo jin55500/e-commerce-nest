@@ -1,20 +1,22 @@
-import { Body, Controller, Get, InternalServerErrorException, Post, Request, UseGuards, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, InternalServerErrorException, Post, Request, UseGuards, UseInterceptors, ValidationPipe } from '@nestjs/common';
 import { RegisterDto } from './register.dto';
 import { AuthService } from './auth.service';
 import { LoginDto } from './login.dto';
 import { AuthGuard } from './guards/auth.guard';
 import { promises } from 'dns';
+import { RegisterInterceptor } from './interceptors/register.intercepter';
 
 @Controller('auth')
 export class AuthController {
     constructor(private authService: AuthService){}
 
     @Post('/register')
+    @UseInterceptors(RegisterInterceptor)
     async register(@Body(new ValidationPipe) registerDto: RegisterDto){
         try {
             const data = await this.authService.register(registerDto);
-            let { name, email, ...user } = data;
-            return user;
+            // let { name, email, ...user } = data;
+            return data;
         } catch (error) {
             // จัดการข้อผิดพลาดที่เกิดขึ้น
             throw new InternalServerErrorException(error);

@@ -1,10 +1,12 @@
-import { Body, Controller, Get, Param, Patch, Post, Request, UseGuards, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, Request, UseGuards, ValidationPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { AdminGuard } from 'src/auth/guards/admin.guard';
 import { UserCreateDto } from './dto/userCreate.dto';
 import { User } from './user.entity';
 import { UserUpdateDto } from './dto/userUpdate.dto';
+import { query } from 'express';
+import { UserSearchDto } from './dto/userSearch.dto';
 
 @Controller('user')
 export class UsersController {
@@ -12,8 +14,8 @@ export class UsersController {
 
     @Get()
     @UseGuards(AuthGuard,AdminGuard)
-    async findAll(@Request() req): Promise<any> {
-      return await this.userService.findAll()
+    async findAll(@Request() req,@Query() userSearchDto:UserSearchDto): Promise<any> {
+      return await this.userService.findAll(userSearchDto)
     }
 
     @Post()

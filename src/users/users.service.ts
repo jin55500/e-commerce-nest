@@ -6,6 +6,8 @@ import { UserCreateDto } from './dto/userCreate.dto';
 import * as bcrypt from 'bcryptjs';
 import { Store } from 'src/store/store.entity';
 import { UserUpdateDto } from './dto/userUpdate.dto';
+import {  UserSearchDto } from './dto/userSearch.dto';
+import { query } from 'express';
 @Injectable()
 export class UsersService {
     constructor(
@@ -14,10 +16,23 @@ export class UsersService {
         private readonly connection: Connection,
     ){}
 
-    async findAll(): Promise<User[]>{
-        return await this.userRepository.find({
-            relations:['store'],
-        })
+    async findAll(userSearchDto:UserSearchDto): Promise<{ data: User[], total: number }>{
+        const { search, page = 1, size = 10 } = userSearchDto;
+
+        const user = this.userRepository.createQueryBuilder('user')
+        .innerJoinAndSelect('user.store', 'store')
+        
+        if(search){
+            user.where(`user.name LIKE '%${search}%' OR user.email LIKE '%${search}%'`)
+        }
+
+        user.skip((page-1)*size).take(size)
+        // return await this.userRepository.find({
+        //     relations:['store'],
+        // })
+        const [data, total] = await user.getManyAndCount();
+        return { data, total };
+
     }
 
     async create(UserCreateDto:UserCreateDto): Promise<User>{
@@ -70,6 +85,9 @@ export class UsersService {
         if(!user){
             throw new NotFoundException()
         }
+
+        const store = await this.storeRepository.find({where:{user}})
+        console.log(store)
         return user
         
     }

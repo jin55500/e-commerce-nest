@@ -22,7 +22,7 @@ export class AuthService {
       ) {}
 
     
-    async register(registerDto: RegisterDto): Promise<User>{
+    async register(registerDto: RegisterDto): Promise<Store>{
         // console.log("test");
         const queryRunner = this.connection.createQueryRunner();
         await queryRunner.connect();
@@ -48,7 +48,7 @@ export class AuthService {
             await queryRunner.commitTransaction();
             await queryRunner.release();
 
-            return createUser
+            return createStore
         }catch(err){
             await queryRunner.rollbackTransaction();
             await queryRunner.release();
